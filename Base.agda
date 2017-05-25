@@ -4,6 +4,7 @@ module Base where
 
 infixr 9 _∘_
 infixl 1 _on_
+infix  0 case_return_of_ case_of_
 
 infix  4 _≢_
 infix  3  ¬_
@@ -63,6 +64,16 @@ _on_ : ∀ {ℓ₁ ℓ₂ ℓ₃}
        → (A → A → C)
 _∙_ on f = λ x y → f x ∙ f y
 
+case_return_of_ :
+  ∀ {ℓ₁ ℓ₂}
+    {A : Type ℓ₁} (x : A)
+    (B : A → Type ℓ₂)
+  → ((x : A) → B x) → B x
+case x return B of f = f x
+
+case_of_ : ∀ {ℓ₁ ℓ₂} {A : Type ℓ₁} {B : Type ℓ₂} → A → (A → B) → B
+case x of f = case x return _ of f
+
 record Σ {ℓ₁ ℓ₂} (A : Type ℓ₁) (B : A → Type ℓ₂) : Type (ℓ₁ ⊔ ℓ₂) where
   constructor _,_
   field
@@ -84,6 +95,23 @@ syntax Σ A (λ x → B) = Σ[ x ∶ A ] B
         → ((a : A) → B a → τ)
         → (Σ A B → τ)
 Σ-rec = Σ-elim _
+
+_×_ : ∀ {ℓ₁ ℓ₂} → Type ℓ₁ → Type ℓ₂ → Type (ℓ₁ ⊔ ℓ₂)
+A × B = Σ A (λ _ → B)
+
+×-elim : ∀ {ℓ₁ ℓ₂ ℓ₃}
+           {A : Type ℓ₁} {B : Type ℓ₂}
+           (τ : A × B → Type ℓ₃)
+         → ((a : A) (b : B) → τ (a , b))
+         → ((x : A × B) → τ x)
+×-elim = Σ-elim
+
+×-rec : ∀ {ℓ₁ ℓ₂ ℓ₃}
+          {A : Type ℓ₁} {B : Type ℓ₂}
+          {τ : Type ℓ₃}
+        → (A → B → τ)
+        → (A × B → τ)
+×-rec = Σ-rec
 
 data _⊎_ {ℓ₁ ℓ₂} (A : Type ℓ₁) (B : Type ℓ₂) : Type (ℓ₁ ⊔ ℓ₂) where
   i₁ : A → A ⊎ B
@@ -146,6 +174,10 @@ open import Agda.Builtin.Bool
   → τ
   → (𝟚 → τ)
 𝟚-rec = 𝟚-elim _
+
+not : 𝟚 → 𝟚
+not 0₂ = 1₂
+not 1₂ = 0₂
 
 open import Agda.Builtin.Equality
   public
