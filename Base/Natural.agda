@@ -231,3 +231,6 @@ mutual
   ≰⇒> : ∀ {m n} → m ≰ n → m > n
   ≰⇒> {zero}   {n} 0≰n = 0≤n n ↯ 0≰n
   ≰⇒> {succ m} {n} m≮n = m≤n⇒sm≤sn (≮⇒≥ m≮n)
+
+≰⇒≥ : ∀ {m n} → m ≰ n → m ≥ n
+≰⇒≥ = <⇒≤ ∘ ≰⇒>
