@@ -7,14 +7,7 @@ open import Base.Equality
 open import Base.WellFounded
 open import Base.Natural
 
-Decreasing : (ℕ → ℕ) → Type₀
-Decreasing f = ∀ n → f (succ n) ≤ f n
-
--- A small lemma for decreasing functions which we will need later.
-
-Decreasing-+ : {f : ℕ → ℕ} → Decreasing f → (m n : ℕ) → f (m + n) ≤ f n
-Decreasing-+ dec zero     n = refl
-Decreasing-+ dec (succ m) n = ≤-trans (dec (m + n)) (Decreasing-+ dec m n)
+open import Decreasing
 
 Valley : (ℕ → ℕ) → ℕ → ℕ → Type₀
 Valley f n x = ∀ y → x ≤ y → y ≤ (n + x) → f y ≡ f x

@@ -6,6 +6,8 @@ open import Base
 open import Base.Equality
 open import Base.WellFounded
 
+infix 4 _≤_ _≰_ _≥_ _≱_ _<_ _≮_ _>_ _≯_
+
 open import Agda.Builtin.Nat
   public
   using ( zero
@@ -76,18 +78,42 @@ data _≤_ (m : ℕ) : ℕ → Type₀ where
 _≰_ : ℕ → ℕ → Type₀
 m ≰ n = ¬ m ≤ n
 
+_≥_ : ℕ → ℕ → Type₀
+m ≥ n = n ≤ m
+
+_≱_ : ℕ → ℕ → Type₀
+m ≱ n = n ≰ m
+
 _<_ : ℕ → ℕ → Type₀
 m < n = succ m ≤ n
 
+_>_ : ℕ → ℕ → Type₀
+m > n = n < m
+
 _≮_ : ℕ → ℕ → Type₀
 m ≮ n = ¬ m < n
+
+_≯_ : ℕ → ℕ → Type₀
+m ≯ n = n ≮ m
+
+-- TODO: this needs some MASSIVE cleaning up.
+
+≡⇒≤ : ∀ {m n} → m ≡ n → m ≤ n
+≡⇒≤ refl = refl
 
 0≤n : ∀ n → zero ≤ n
 0≤n zero     = refl
 0≤n (succ n) = succ (0≤n n)
 
+0<sn : ∀ n → zero < succ n
+0<sn zero     = refl
+0<sn (succ n) = succ (0<sn n)
+
 n≮0 : ∀ n → n ≮ zero
 n≮0 n = λ ()
+
+n≤0⇒n≡0 : ∀ {n} → n ≤ zero → n ≡ zero
+n≤0⇒n≡0 refl = refl
 
 m≤n⇒sm≤sn : ∀ {m n} → m ≤ n → succ m ≤ succ n
 m≤n⇒sm≤sn refl       = refl
@@ -102,35 +128,49 @@ m≰n⇒sm≰sn : ∀ {m n} → m ≰ n → succ m ≰ succ n
 m≰n⇒sm≰sn m≰n = λ sm≤sn → sm≤sn⇒m≤n sm≤sn ↯ m≰n
 
 <-irrefl : ∀ n → n ≮ n
-<-irrefl zero     = λ()
+<-irrefl zero     = λ ()
 <-irrefl (succ n) = λ sn<sn → sn<sn ↯ m≰n⇒sm≰sn (<-irrefl n)
 
-m<n⇒m≤n : ∀ {m n} → m < n → m ≤ n
-m<n⇒m≤n refl       = succ refl
-m<n⇒m≤n (succ m<n) = succ (m<n⇒m≤n m<n)
+<⇒≤ : ∀ {m n} → m < n → m ≤ n
+<⇒≤ refl       = succ refl
+<⇒≤ (succ m<n) = succ (<⇒≤ m<n)
 
 m≰sn⇒m≰n : ∀ {m n} → m ≰ succ n → m ≰ n
 m≰sn⇒m≰n m≰sn m≤n = succ m≤n ↯ m≰sn
 
-m≰n⇒sm≰n : ∀ {m n} → m ≰ n → succ m ≰ n
-m≰n⇒sm≰n m≰n sm≤n = m<n⇒m≤n sm≤n ↯ m≰n
+≰⇒≮ : ∀ {m n} → m ≰ n → m ≮ n
+≰⇒≮ m≰n m<n = <⇒≤ m<n ↯ m≰n
 
-m≤n⇒n≮m : ∀ {m n} → m ≤ n → n ≮ m
-m≤n⇒n≮m refl       = <-irrefl _
-m≤n⇒n≮m (succ m≤n) = m≰n⇒sm≰n (m≤n⇒n≮m m≤n)
+≤⇒≯ : ∀ {m n} → m ≤ n → m ≯ n
+≤⇒≯ refl       = <-irrefl _
+≤⇒≯ (succ m≤n) = ≰⇒≮ (≤⇒≯ m≤n)
 
 ≤-antisym : ∀ {m n} → m ≤ n → n ≤ m → m ≡ n
 ≤-antisym refl       _   = refl
-≤-antisym (succ m≤n) n<m = n<m ↯ m≤n⇒n≮m m≤n
+≤-antisym (succ m≤n) n<m = n<m ↯ ≤⇒≯ m≤n
 
 ≤-trans : ∀ {m n p} → m ≤ n → n ≤ p → m ≤ p
 ≤-trans refl       m≤p        = m≤p
 ≤-trans m≤n        refl       = m≤n
-≤-trans (succ m≤n) (succ n<p) = ≤-trans m≤n (succ (m<n⇒m≤n n<p))
+≤-trans (succ m≤n) (succ n<p) = m≤n ⟨ ≤-trans ⟩ (succ (<⇒≤ n<p))
 
 m≤n⇒m≢n⇒m<n : ∀ {m n} → m ≤ n → m ≢ n → m < n
 m≤n⇒m≢n⇒m<n refl       m≢m = refl ↯ m≢m
 m≤n⇒m≢n⇒m<n (succ m≤n) _   = m≤n⇒sm≤sn m≤n
+
+m≤n+m : ∀ m n → m ≤ n + m
+m≤n+m m zero     = refl
+m≤n+m m (succ n) = succ (m≤n+m m n)
+
+m≤m+n : ∀ m n → m ≤ m + n
+m≤m+n m n = ≡-rec (_≤_ m) (m≤n+m m n) (+-comm n m)
+
+m+n≤p⇒m≤p : ∀ {m n p} → m + n ≤ p → m ≤ p
+m+n≤p⇒m≤p {m} {n} refl         = m≤m+n m n
+m+n≤p⇒m≤p         (succ m+n≤p) = succ (m+n≤p⇒m≤p m+n≤p)
+
+m+n≤p⇒n≤p : ∀ {m n p} → m + n ≤ p → n ≤ p
+m+n≤p⇒n≤p {m} {n} {p} m+n≤p = m+n≤p⇒m≤p (≡-rec (flip _≤_ p) m+n≤p (+-comm m n))
 
 wf-< : WellFounded _<_
 wf-< = λ x → accessible (acc x) where
@@ -138,3 +178,56 @@ wf-< = λ x → accessible (acc x) where
   acc zero y y<0            = y<0 ↯ n≮0 y
   acc (succ x) _ refl       = accessible (λ y y<x → acc x y y<x)
   acc (succ x) y (succ y<x) = acc x y y<x
+
+n-n≡0 : ∀ n → n - n ≡ zero
+n-n≡0 zero     = refl
+n-n≡0 (succ n) = n-n≡0 n
+
+m≤n⇒sn-m≡s[n-m] : ∀ {m n} → m ≤ n → succ n - m ≡ succ (n - m)
+m≤n⇒sn-m≡s[n-m] {zero}   m≤n        = refl
+m≤n⇒sn-m≡s[n-m] {succ m} refl       = m≤n⇒sn-m≡s[n-m] {m} refl
+m≤n⇒sn-m≡s[n-m] {succ m} (succ m≤n) = m≤n⇒sn-m≡s[n-m] (<⇒≤ m≤n)
+
+m+n-n≡m : ∀ m n → m + n - n ≡ m
+m+n-n≡m zero     n = n-n≡0 n
+m+n-n≡m (succ m) n = m≤n⇒sn-m≡s[n-m] (m≤n+m n m) ∙ ap succ (m+n-n≡m m n)
+
+m≤n⇒[n-m]+m≡n : ∀ {m n} → m ≤ n → (n - m) + m ≡ n
+m≤n⇒[n-m]+m≡n {m} refl       = ap (flip _+_ m) (n-n≡0 m)
+m≤n⇒[n-m]+m≡n {m} (succ m≤n) =
+  ap (flip _+_ m) (m≤n⇒sn-m≡s[n-m] m≤n) ∙ ap succ (m≤n⇒[n-m]+m≡n m≤n)
+
+mutual
+
+  m-sn≤m-n : ∀ m n → m - succ n ≤ m - n
+  m-sn≤m-n zero n = 0≤n (zero - n)
+  m-sn≤m-n (succ m) n = m-n≤sm-n m n
+
+  m-n≤sm-n : ∀ m n → m - n ≤ succ m - n
+  m-n≤sm-n m zero     = succ refl
+  m-n≤sm-n m (succ n) = m-sn≤m-n m n
+
+m+n≤p⇒m≤p-n : ∀ {m n p} → m + n ≤ p → m ≤ p - n
+m+n≤p⇒m≤p-n {m} {n}          refl         = ≡-rec (_≤_ m) refl (m+n-n≡m m n ⁻¹)
+m+n≤p⇒m≤p-n {m} {n} {succ p} (succ m+n≤p) =
+  m+n≤p⇒m≤p-n m+n≤p ⟨ ≤-trans ⟩ m-n≤sm-n p n
+
+_≤?_ : ∀ m n → m ≤ n ⊎ m ≰ n
+zero   ≤? n    = i₁ (0≤n n)
+succ m ≤? zero = i₂ (λ ())
+succ m ≤? succ n with m ≤? n
+... | i₁ m≤n = i₁ (m≤n⇒sm≤sn m≤n)
+... | i₂ m≰n = i₂ (m≰n⇒sm≰sn m≰n)
+
+sm≰sn⇒m≰n : ∀ {m n} → succ m ≰ succ n → m ≰ n
+sm≰sn⇒m≰n {m} {n} sm≰sn = λ m≤n → m≤n⇒sm≤sn m≤n ↯ sm≰sn
+
+mutual
+
+  ≮⇒≥ : ∀ {m n} → m ≮ n → m ≥ n
+  ≮⇒≥ {m} {zero}   m≮n   = 0≤n m
+  ≮⇒≥ {m} {succ n} sm≰sn = ≰⇒> (sm≰sn⇒m≰n sm≰sn)
+
+  ≰⇒> : ∀ {m n} → m ≰ n → m > n
+  ≰⇒> {zero}   {n} 0≰n = 0≤n n ↯ 0≰n
+  ≰⇒> {succ m} {n} m≮n = m≤n⇒sm≤sn (≮⇒≥ m≮n)
