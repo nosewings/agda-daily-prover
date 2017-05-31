@@ -3,8 +3,10 @@
 module Base where
 
 infixr 9 _∘_
+infixl 9 _⨾_
 infixl 1 _⟨_⟩_
 infixl 1 _on_
+infixl 0 _&_
 infix  0 case_return_of_ case_of_
 
 infix  4 _≢_
@@ -49,6 +51,14 @@ instance
 Π A B = (a : A) → B a
 syntax Π A (λ x → B) = Π[ x ∶ A ] B
 
+_&_ : ∀ {ℓ₁ ℓ₂}
+        {A : Type ℓ₁}
+        {B : A → Type ℓ₂}
+      → (a : A)
+      → Π A B
+      → B a
+x & f = f x
+
 _∘_ : ∀ {ℓ₁ ℓ₂ ℓ₃}
         {A : Type ℓ₁}
         {B : A → Type ℓ₂}
@@ -57,6 +67,15 @@ _∘_ : ∀ {ℓ₁ ℓ₂ ℓ₃}
       → (f : Π A B)
       → ((a : A) → C a (f a))
 g ∘ f = λ a → g (f a)
+
+_⨾_ : ∀ {ℓ₁ ℓ₂ ℓ₃}
+        {A : Type ℓ₁}
+        {B : A → Type ℓ₂}
+        {C : (a : A) → B a → Type ℓ₃}
+        (f : Π A B)
+      → ({a : A} → Π (B a) (C a))
+      → ((a : A) → C a (f a))
+f ⨾ g = λ a → g (f a)
 
 flip : ∀ {ℓ₁ ℓ₂ ℓ₃}
          {A : Type ℓ₁} {B : Type ℓ₂} {C : A → B → Type ℓ₃}
