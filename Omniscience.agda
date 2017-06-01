@@ -46,10 +46,10 @@ module LPO⇒InfiniteValleys where
   -- If gᶠ is 0₂ everywhere, then f(x) = f(0) for all x by the inversion
   -- princple for g(x) = 0. This means that f has an infinite valley at 0.
   --
-  -- If gᶠ is 1₂ at x, recurse on shift x f. (We have shown above that this
+  -- If gᶠ is 1₂ at x, recurse on shift(x, f). (We have shown above that this
   -- function is decreasing). The recursion will eventually terminate because
-  -- f(x) < f(0) by the inversion principle for gᶠ(x) = 1₂, and the less-than
-  -- relationship is well-founded.
+  -- shift(x, f)(0) = f(x) < f(0) by the inversion principle for gᶠ(x) = 1₂, and
+  -- the less-than relationship is well-founded.
   --
   -- The recursive call yields y : ℕ and v : InfiniteValley (shift x f) y. The
   -- expanded type of v is ∀ z → y ≤ z → f (z + x) ≡ f (y + x), so we take y + x
