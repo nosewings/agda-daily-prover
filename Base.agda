@@ -207,6 +207,26 @@ x ↯ f = 𝟘-rec (f x)
 contrapositive : ∀ {ℓ₁ ℓ₂} {A : Type ℓ₁} {B : Type ℓ₂} → (A → B) → (¬ B → ¬ A)
 contrapositive f = λ ¬b → λ a → ¬b (f a)
 
+open import Agda.Builtin.Unit
+  public
+  renaming ( ⊤  to 𝟙
+           ; tt to 0₁
+           )
+
+𝟙-elim :
+  ∀ {ℓ}
+    (τ : 𝟙 → Type ℓ)
+  → τ 0₁
+  → ((x : 𝟙) → τ x)
+𝟙-elim τ z _ = z
+
+𝟙-rec :
+  ∀ {ℓ}
+    {τ : Type ℓ}
+  → τ
+  → (𝟙 → τ)
+𝟙-rec = 𝟙-elim _
+
 open import Agda.Builtin.Bool
   public
   renaming ( Bool  to 𝟚
