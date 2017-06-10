@@ -133,8 +133,8 @@ module _ {ℓ}
       a ∙ x          ∎
 
   -- x⁻¹ should satisfy the equations xx⁻¹ = e and x⁻¹x = e. It is easy to see
-  -- that both x(x\e) = e and (e\x)x = e, and it is not hard to show that
-  -- (x\e)x = e and x(e\x) = e.
+  -- that both x(x\e) = e and (e/x)x = e, and it is not hard to show that
+  -- (x\e)x = e and x(e/x) = e.
 
   _⁻¹ : A → A
   x ⁻¹ = x \\ e
