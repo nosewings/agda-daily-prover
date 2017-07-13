@@ -51,6 +51,9 @@ instance
 Π A B = (a : A) → B a
 syntax Π A (λ x → B) = Π[ x ∶ A ] B
 
+id : ∀ {ℓ} {A : Type ℓ} → (A → A)
+id = λ x → x
+
 _&_ : ∀ {ℓ₁ ℓ₂}
         {A : Type ℓ₁}
         {B : A → Type ℓ₂}

@@ -234,3 +234,13 @@ mutual
 
 ≰⇒≥ : ∀ {m n} → m ≰ n → m ≥ n
 ≰⇒≥ = <⇒≤ ∘ ≰⇒>
+
+n≢sn : {n : ℕ} → n ≢ succ n
+n≢sn {zero}   = λ ()
+n≢sn {succ n} = λ sn≡ssn → n≢sn (succ-inj sn≡ssn)
+
+<⇒≢ : ∀ {m n} → m < n → m ≢ n
+<⇒≢ m<m refl = m<m ↯ <-irrefl _
+
+>⇒≢ : ∀ {m n} → m > n → m ≢ n
+>⇒≢ m>n = λ m≡n → (m≡n ⁻¹) ↯ <⇒≢ m>n
