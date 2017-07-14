@@ -136,7 +136,7 @@ rinv-rinv {succ n} {f} srj (pred i)
  with srj (pred j)       | inspect (rinv srj) (pred j)
 ... | pred k , f[pk]≡pj  | _ = f[pk]≡pj ⁻¹ ∙ ap (f ∘ pred) lower-rinv-f[j]≡i -- lower-rinv-f[j]≡i : k ≡ i
 ... | top    , f[top]≡pj | [ rinv-srj[pj]≡top ]
- with srj top | inspect (rinv srj) top
+  with srj top           | inspect (rinv srj) top
 ... | pred l , f[pl]≡top  | _                     = f[pl]≡top ⁻¹ ∙ ap (f ∘ pred) lower-rinv-f[j]≡i
 ... | top    , _          | [ rinv-srj[top]≡top ] = case rinv-inj srj (rinv-srj[top]≡top ∙ rinv-srj[pj]≡top ⁻¹) of λ ()
 
