@@ -64,9 +64,9 @@ pred-inj refl = refl
 lower : ∀ {n} {f : Fin (succ n) → Fin (succ n)} → Injective f → (Fin n → Fin n)
 lower {f = f} inj i with f (pred i) | inspect f (pred i)
 ... | pred j | _ = j
-... | top  | [ f[pi]≡top ] with f top | inspect f top
+... | top    | [ f[pi]≡top ] with f top | inspect f top
 ... | pred j | _ = j
-... | top  | [ f[top]≡top ] = case inj (f[pi]≡top ∙ f[top]≡top ⁻¹) of λ ()
+... | top    | [ f[top]≡top ] = case inj (f[pi]≡top ∙ f[top]≡top ⁻¹) of λ ()
 
 -- For any injective f : [n+1] → [n+1], lowerᶠ is also injective.
 
