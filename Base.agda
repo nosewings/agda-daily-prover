@@ -8,6 +8,7 @@ infixl 1 _⟨_⟩_
 infixl 1 _on_
 infixl 0 _&_
 infix  0 case_return_of_ case_of_
+infix  0 if_then_else_
 
 infix  4 _≢_
 infix  3  ¬_
@@ -53,6 +54,9 @@ syntax Π A (λ x → B) = Π[ x ∶ A ] B
 
 id : ∀ {ℓ} {A : Type ℓ} → (A → A)
 id = λ x → x
+
+const : ∀ {ℓ₁ ℓ₂} {A : Type ℓ₁} {B : Type ℓ₂} → A → (B → A)
+const x = λ _ → x
 
 _&_ : ∀ {ℓ₁ ℓ₂}
         {A : Type ℓ₁}
@@ -254,6 +258,13 @@ open import Agda.Builtin.Bool
   → (𝟚 → τ)
 𝟚-rec = 𝟚-elim _
 
+pattern false = 0₂
+pattern true  = 1₂
+
+if_then_else_ : ∀ {ℓ} {A : Type ℓ} → 𝟚 → A → A → A
+if false then t else f = f
+if true  then t else f = t
+
 not : 𝟚 → 𝟚
 not 0₂ = 1₂
 not 1₂ = 0₂
@@ -280,6 +291,29 @@ data 𝟛 : Type₀ where
   → τ
   → (𝟛 → τ)
 𝟛-rec = 𝟛-elim _
+
+data Maybe {ℓ} (A : Type ℓ) : Type ℓ where
+  nothing : Maybe A
+  just : A → Maybe A
+
+Maybe-elim :
+  ∀ {ℓ₁ ℓ₂}
+    {A : Type ℓ₁}
+    (τ : Maybe A → Type ℓ₂)
+  → τ nothing
+  → ((a : A) → τ (just a))
+  → ((x : Maybe A) → τ x)
+Maybe-elim τ n j nothing  = n
+Maybe-elim τ n j (just a) = j a
+
+Maybe-rec :
+  ∀ {ℓ₁ ℓ₂}
+    {A : Type ℓ₁}
+    {τ : Type ℓ₂}
+  → τ
+  → (A → τ)
+  → (Maybe A → τ)
+Maybe-rec = Maybe-elim _
 
 open import Agda.Builtin.Equality
   public
@@ -317,7 +351,15 @@ inspect f x = [ refl ]
 _≢_ : ∀ {ℓ} {A : Type ℓ} → A → A → Type ℓ
 x ≢ y = ¬ (x ≡ y)
 
+data Dec {ℓ} (A : Type ℓ) : Type ℓ where
+  yes : A   → Dec A
+  no  : ¬ A → Dec A
+
+⌊_⌋ : ∀ {ℓ} {A : Type ℓ} → Dec A → 𝟚
+⌊ yes _ ⌋ = true
+⌊ no  _ ⌋ = false
+
 record DecEq {ℓ} (A : Type ℓ) : Type ℓ where
   field
-    _≟_ : (x y : A) → x ≡ y ⊎ x ≢ y
+    _≟_ : (x y : A) → Dec (x ≡ y)
 open DecEq ⦃...⦄ public
