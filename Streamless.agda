@@ -53,6 +53,7 @@ module _ {ℓ} (funext : Funext Level.zero ℓ) where
   ... | m₂ , n₂ , m₂≢n₂ , x≡d[n₂] | [ π₁[h[d]]≡m₂ ] with m₂ ≟ m₁
   ... | yes refl  = yes (d-elsewhere x y (≢-inv m₂≢n₂) ⁻¹ ∙ x≡d[n₂] ⁻¹)
   ... | no  m₂≢m₁ = no  (λ x≡y → (π₁[h[d]]≡m₂ ⁻¹ ∙ ap (π₁ ∘ h) (d-connect x≡y) ⁻¹ ∙ π₁[h[k]]≡m₁) ↯ m₂≢m₁) where
+
     d-connect-pointwise : x ≡ y → ∀ z → const x z ≡ d x m₁ y z
     d-connect-pointwise x≡y z with ⌊ z ≟ m₁ ⌋
     ... | true  = x≡y
