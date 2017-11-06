@@ -20,19 +20,19 @@ module LPO⇒InfiniteValleys where
   module _ (f : ℕ → ℕ) where
 
     g : (ℕ → 𝟚)
-    g x with f x ≟ f zero
-    ... | i₁ _ = 0₂
-    ... | i₂ _ = 1₂
+    g x with ⌊ f x ≟ f zero ⌋
+    ... | true  = 0₂
+    ... | false = 1₂
 
     g≡0₂-inv : ∀ {x} → g x ≡ 0₂ → f x ≡ f zero
     g≡0₂-inv {x} _ with f x ≟ f zero
-    g≡0₂-inv     _    | i₁ f[x]≡f[0] = f[x]≡f[0]
-    g≡0₂-inv     ()   | i₂ _
+    g≡0₂-inv     _    | yes f[x]≡f[0] = f[x]≡f[0]
+    g≡0₂-inv     ()   | no  _
 
     g≡1₂-Decreasing-inv : Decreasing f → ∀ {x} → g x ≡ 1₂ → f x < f zero
     g≡1₂-Decreasing-inv dec {x} _ with f x ≟ f zero
-    g≡1₂-Decreasing-inv dec     ()   | i₁ _
-    g≡1₂-Decreasing-inv dec     _    | i₂ f[x]≢f[0] = m≤n⇒m≢n⇒m<n (Decreasing-≤ dec (0≤n _)) f[x]≢f[0]
+    g≡1₂-Decreasing-inv dec     ()   | yes _
+    g≡1₂-Decreasing-inv dec     _    | no  f[x]≢f[0] = m≤n⇒m≢n⇒m<n (Decreasing-≤ dec (0≤n _)) f[x]≢f[0]
 
   shift : ∀ {ℓ} {A : Type ℓ} → ℕ → (ℕ → A) → (ℕ → A)
   shift n f = λ x → f (x + n)

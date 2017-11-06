@@ -38,6 +38,9 @@ module _ {ℓ} {A : Type ℓ} where
   _∎ : (x : A) → x ≡ x
   _ ∎ = refl
 
+≢-inv : ∀ {ℓ} {A : Type ℓ} {x y : A} → x ≢ y → y ≢ x
+≢-inv x≢y = λ y≡x → (y≡x ⁻¹) ↯ x≢y
+
 ap : ∀ {ℓ₁ ℓ₂}
        {A : Type ℓ₁} {B : Type ℓ₂}
        (f : A → B)

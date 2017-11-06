@@ -45,13 +45,13 @@ succ-inj refl = refl
 instance
   DecEq-Nat#instance : DecEq ℕ
   DecEq-Nat#instance = record { _≟_ = _==_ } where
-    _==_ : (x y : ℕ) → x ≡ y ⊎ x ≢ y
-    zero   == zero   = i₁ refl
-    zero   == succ y = i₂ (zero≢succ y)
-    succ x == zero   = i₂ (succ≢zero x)
+    _==_ : (x y : ℕ) → Dec (x ≡ y)
+    zero   == zero   = yes refl
+    zero   == succ y = no  (zero≢succ y)
+    succ x == zero   = no  (succ≢zero x)
     succ x == succ y with x == y
-    ... | i₁ x≡y = i₁ (ap succ x≡y)
-    ... | i₂ x≢y = i₂ (contrapositive succ-inj x≢y)
+    ... | yes x≡y = yes (ap succ x≡y)
+    ... | no  x≢y = no  (contrapositive succ-inj x≢y)
 
 sm+n≡m+sn : ∀ m n → succ m + n ≡ m + succ n
 sm+n≡m+sn zero     n = refl

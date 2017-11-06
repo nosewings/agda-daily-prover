@@ -55,8 +55,8 @@ module Valley where
                → Σ[ m ∶ ℕ ] Σ[ v ∶ Valley f m x ] (Maximal m v ⊎ m ≡ n)
   seek-maximal f zero     x = zero , null f x , i₂ refl
   seek-maximal f (succ n) x with f (succ x) ≟ f x
-  ... | i₂ f[sx]≢fx = zero , null f x , i₁ f[sx]≢fx
-  ... | i₁ f[sx]≡fx with seek-maximal f n (succ x)
+  ... | no  f[sx]≢fx = zero , null f x , i₁ f[sx]≢fx
+  ... | yes f[sx]≡fx with seek-maximal f n (succ x)
   ... | m , v , i₂ m≡n =
       succ m
     , cons-left m (f[sx]≡fx ⁻¹) v
